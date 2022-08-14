@@ -8,7 +8,7 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	"github.com/200sc/foptsgen"
+	"github.com/200sc/foptgen"
 )
 
 // foptgen generates functional options to populate a struct
@@ -22,7 +22,7 @@ func main() {
 	os.Exit(0)
 }
 
-const version = "0.0.1"
+const version = "0.0.2"
 
 var help = flag.Bool("help", false, "display this help text")
 var typ = flag.String("struct", "", "struct type to create functional options for (required)")
@@ -32,6 +32,8 @@ var directory = flag.String("dir", ".", "target directory to search for struct d
 var fiximports = flag.Bool("fix-imports", true, "run 'goimports' after generation")
 var outputToDirectory = flag.Bool("output-to-dir", true, "prepend output with --dir")
 var printVersion = flag.Bool("version", false, "print version and exit")
+var overwrite = flag.Bool("overwrite", true, "overwrite existing same-named output file")
+var optionTypeName = flag.String("option-type-name", "Option", "the functional option type name")
 
 func run() error {
 	flag.Parse()
@@ -55,11 +57,13 @@ func run() error {
 		*output = filepath.Join(*directory, *output)
 	}
 
-	if err := foptsgen.CheckIfOutputExists(*output); err != nil {
-		return err
+	if !(*overwrite) {
+		if err := foptgen.CheckIfOutputExists(*output); err != nil {
+			return err
+		}
 	}
 
-	structDef, fset, pkg, err := foptsgen.FindStructInDirectory(*directory, *typ)
+	structDef, fset, pkg, err := foptgen.FindStructInDirectory(*directory, *typ)
 	if err != nil {
 		return err
 	}
@@ -67,7 +71,7 @@ func run() error {
 		*genPackage = pkg
 	}
 
-	tplInput := foptsgen.NewTemplateInput(structDef, fset, *typ, *genPackage)
+	tplInput := foptgen.NewTemplateInput(structDef, fset, *typ, *genPackage, *optionTypeName)
 
 	outFile, err := os.Create(*output)
 	if err != nil {
@@ -75,7 +79,7 @@ func run() error {
 	}
 	defer outFile.Close()
 
-	if err := foptsgen.WriteTemplate(outFile, tplInput); err != nil {
+	if err := foptgen.WriteTemplate(outFile, tplInput); err != nil {
 		return err
 	}
 

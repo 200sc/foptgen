@@ -2,10 +2,16 @@
 
 foptgen is a binary tool that generates functional options for Go structs.
 
+## Install
+
+```bash
+go install github.com/200sc/foptgen/main/foptgen
+```
+
 ## Usage 
 
 ```bash
-$ foptgen --dir=internal/components/titlebar --struct=Constructor
+$ foptgen --dir=internal/components/titlebar --struct=Constructor --overwrite=false
 Output target internal/components/titlebar/opts_gen.go already exists; overwrite? (y/N)
 y
 ```

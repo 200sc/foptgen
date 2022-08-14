@@ -1,4 +1,4 @@
-package foptsgen
+package foptgen
 
 import (
 	"errors"

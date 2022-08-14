@@ -1,4 +1,4 @@
-package foptsgen
+package foptgen
 
 import (
 	"bytes"
@@ -15,9 +15,10 @@ import (
 var TemplateFile string
 
 type TemplateInput struct {
-	PackageName string
-	Options     []TemplateOption
-	StructName  string
+	PackageName    string
+	Options        []TemplateOption
+	StructName     string
+	OptionTypeName string
 }
 
 type TemplateOption struct {
@@ -38,12 +39,16 @@ func WriteTemplate(w io.Writer, tplInput *TemplateInput) error {
 	return nil
 }
 
-func NewTemplateInput(structDef *ast.StructType, fset *token.FileSet, structName, pkg string) *TemplateInput {
+func NewTemplateInput(structDef *ast.StructType, fset *token.FileSet, structName, pkg, optionTypeName string) *TemplateInput {
 	tplInput := &TemplateInput{
-		PackageName: pkg,
-		StructName:  structName,
+		PackageName:    pkg,
+		StructName:     structName,
+		OptionTypeName: optionTypeName,
 	}
 	for _, fd := range structDef.Fields.List {
+		if len(fd.Names) == 0 {
+			continue
+		}
 		buff := bytes.NewBuffer([]byte{})
 		// Assumption: these are valid ast nodes, so this should not error
 		_ = printer.Fprint(buff, fset, fd.Type)

@@ -3,11 +3,11 @@
 
 package {{ $tree.PackageName }}
 
-type Option func({{ $tree.StructName }}) {{ $tree.StructName }}
+type {{ $tree.OptionTypeName }} func({{ $tree.StructName }}) {{ $tree.StructName }}
 
 {{- range $optIdx, $opt := $tree.Options }}
 
-func With{{ $opt.FieldName}}(v {{ $opt.FieldType }}) Option {
+func With{{ $opt.FieldName}}(v {{ $opt.FieldType }}) {{ $tree.OptionTypeName }} {
     return func(s {{ $tree.StructName }}) {{ $tree.StructName }} {
         s.{{ $opt.FieldName }} = v 
         return s 
